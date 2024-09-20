@@ -224,6 +224,11 @@ export default {
 </script>
 
 <style lang="less">
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    
     .floating-window-box {
         display: flex;
         position: fixed;

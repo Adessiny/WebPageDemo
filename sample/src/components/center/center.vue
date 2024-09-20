@@ -14,23 +14,11 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="func-wrapper">
-                    <div class="user-msg-dropdown">
-                        <img src="../center/images/more.png" class="more">
-                        <div class="msg-preview-wrap"></div>
-                    </div>
-                    <div class="split-line"></div>
+                <div class="func-wrapper">
                     <div class="user-status" @click="showAuthModal">
-                        <img src="../center/images/doggy.jpg" class="avator">
-                        <div style="width: 20px;height: 30px;">
-                            <div class="dropdown" style="height: 30px;">
-                                <div class="dropdown-allow">
-                                    <img src="" class="allow">
-                                </div>
-                            </div>
-                        </div>
+                        <img @click="showUserHere(true)" src="../center/images/doggy.jpg" class="avator">
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
         <img src="../center/images/header.jpg" class="hd">
@@ -41,7 +29,7 @@
         <Grid v-if="currentView === 'center'"/>
         <Recommend @changeView="showComponent2" :sendData="currentView" v-if="currentView === 'center'"/>
         <Courses v-if="currentView === 'Courses'"/>
-        
+        <User @showUser="showUser" :sendData="isUserVisable" v-if="isUserVisable"/>
         <!-- 选择题库 -->
         <Selection @showSelections="showSelections" :sendData="isSelectionVisable" v-if="isSelectionVisable === '1'"/>
         <!-- 答题引入 -->
@@ -57,6 +45,7 @@ import Recommend from "../Recommend/Recommend.vue";
 import Courses from "../Courses/Courses.vue";
 import Selection from "../Selection.vue";
 import Exam from "../Exam.vue";
+import User from "../User.vue";
 
 export default {
     name: 'index',
@@ -66,14 +55,15 @@ export default {
         Grid,
         Recommend,
         Courses,
+        User,
         Selection,
         Exam
     },
     data() {
         return {
             currentView: 'center',
-            // isExamVisable: false,
-            isSelectionVisable: '0'
+            isUserVisable: false,
+            isSelectionVisable: '0',
         };
     },
 
@@ -94,13 +84,17 @@ export default {
             });
             console.log('页面值2:'+this.currentView);
         },
-        // showExams(data) {
-        //     console.log("这里也已运行")
-        //     this.isExamVisable = data.showExamsOut;
-        // },
         showSelections(data) {
             this.isSelectionVisable = String(data.showSelectionsOut);
             console.log("这里也已运行",this.isSelectionVisable)
+        },
+        showUserHere(bool) {
+            this.isUserVisable = bool;
+            console.log("center已调用User", this.isUserVisable)
+        },
+        showUser(data) {
+            this.isUserVisable = data.showUserOut;
+            console.log("用户已回到center", this.isUserVisable)
         }
     }
 };
@@ -193,13 +187,6 @@ export default {
             //         z-index: 9999;
             //     }
             // }
-            .split-line{
-                width: 3px;
-                height: 40px;
-                margin: 0 22px;
-                background-color: white;
-                opacity: 0.2;
-            }
             .user-status{
                 position: relative;
                 display: flex;

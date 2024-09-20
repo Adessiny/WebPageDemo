@@ -74,6 +74,10 @@
 </script>
 
 <style scoped>
+    *{
+        margin: 0;
+        padding: 0;
+    }
     .floating-window-box {
         display: flex;
         position: fixed;
