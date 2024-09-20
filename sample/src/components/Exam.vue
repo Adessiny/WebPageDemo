@@ -54,150 +54,150 @@
 </template>
 
 <script>
-export default {
-    name: 'Exam',
-    props: {
-        sendData: {
-            type: String,
-            Required: true
-        }
-    },
-    data() {
-        return {
-            questions: [],
-            currentQuestionIndex: 0,
-            selectedOption: '',
-            score: 0,
-            isFinished: false
-        };
-    },
-
-    computed: {
-        currentQuestion() {
-            return this.questions[this.currentQuestionIndex] || {};
-        }
-    },
-
-    mounted() {
-        this.fetchData();
-    },
-
-    methods: {
-        setSelectionInvisable(int){
-            let data = { showSelectionsOut:int };
-            this.$emit('showSelections', data)
-            console.log("已调用",data)
+    export default {
+        name: 'Exam',
+        props: {
+            sendData: {
+                type: String,
+                Required: true
+            }
+        },
+        data() {
+            return {
+                questions: [],
+                currentQuestionIndex: 0,
+                selectedOption: '',
+                score: 0,
+                isFinished: false
+            };
         },
 
-        async fetchData() {
-            if(this.sendData == '2'){
-                try {
-                    let result = await get('GET', 'getPython');
-                    this.questions = result || [];
-                    this.currentQuestionIndex = 0;
-                    this.selectedOption = '';
-                    this.score = 0;
-                    this.isFinished = false;
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                }
-            }
-            else if(this.sendData == '3'){
-                try {
-                    let result = await get('GET', 'getC');
-                    this.questions = result || [];
-                    this.currentQuestionIndex = 0;
-                    this.selectedOption = '';
-                    this.score = 0;
-                    this.isFinished = false;
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                }
-            }
-            else if(this.sendData == '4'){
-                try {
-                    let result = await get('GET', 'getCpp');
-                    this.questions = result || [];
-                    this.currentQuestionIndex = 0;
-                    this.selectedOption = '';
-                    this.score = 0;
-                    this.isFinished = false;
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                }
-            }
-            else if(this.sendData == '5'){
-                try {
-                    let result = await get('GET', 'getJava');
-                    this.questions = result || [];
-                    this.currentQuestionIndex = 0;
-                    this.selectedOption = '';
-                    this.score = 0;
-                    this.isFinished = false;
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                }
-            }
-            else if(this.sendData == '6'){
-                try {
-                    let result = await get('GET', 'getVue');
-                    this.questions = result || [];
-                    this.currentQuestionIndex = 0;
-                    this.selectedOption = '';
-                    this.score = 0;
-                    this.isFinished = false;
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                }
+        computed: {
+            currentQuestion() {
+                return this.questions[this.currentQuestionIndex] || {};
             }
         },
 
-        nextQuestion() {
-            this.checkAnswer();
-            if (this.currentQuestionIndex < this.questions.length - 1) {
-                this.currentQuestionIndex++;
-                this.selectedOption = '';
-            }
-        },
-
-        previousQuestion() {
-            if (this.currentQuestionIndex > 0) {
-                this.currentQuestionIndex--;
-                this.selectedOption = '';
-            }
-        },
-
-        finishQuiz() {
-            this.checkAnswer();
-            this.isFinished = true;
-        },
-
-        checkAnswer() {
-            if (this.selectedOption === this.getCorrectOptionContent(this.currentQuestion.correct_option)) {
-                this.score++;
-            }
-        },
-
-        getCorrectOptionContent(correctOption) {
-            switch (correctOption) {
-                case 'A':
-                    return this.currentQuestion.optionA;
-                case 'B':
-                    return this.currentQuestion.optionB;
-                case 'C':
-                    return this.currentQuestion.optionC;
-                case 'D':
-                    return this.currentQuestion.optionD;
-                default:
-                    return '';
-            }
-        },
-
-        restartQuiz() {
+        mounted() {
             this.fetchData();
-        }
-    },
-}
+        },
+
+        methods: {
+            setSelectionInvisable(int){
+                let data = { showSelectionsOut:int };
+                this.$emit('showSelections', data)
+                console.log("已调用",data)
+            },
+
+            async fetchData() {
+                if(this.sendData == '2'){
+                    try {
+                        let result = await get('GET', 'getPython');
+                        this.questions = result || [];
+                        this.currentQuestionIndex = 0;
+                        this.selectedOption = '';
+                        this.score = 0;
+                        this.isFinished = false;
+                    } catch (error) {
+                        console.error('获取数据失败:', error);
+                    }
+                }
+                else if(this.sendData == '3'){
+                    try {
+                        let result = await get('GET', 'getC');
+                        this.questions = result || [];
+                        this.currentQuestionIndex = 0;
+                        this.selectedOption = '';
+                        this.score = 0;
+                        this.isFinished = false;
+                    } catch (error) {
+                        console.error('获取数据失败:', error);
+                    }
+                }
+                else if(this.sendData == '4'){
+                    try {
+                        let result = await get('GET', 'getCpp');
+                        this.questions = result || [];
+                        this.currentQuestionIndex = 0;
+                        this.selectedOption = '';
+                        this.score = 0;
+                        this.isFinished = false;
+                    } catch (error) {
+                        console.error('获取数据失败:', error);
+                    }
+                }
+                else if(this.sendData == '5'){
+                    try {
+                        let result = await get('GET', 'getJava');
+                        this.questions = result || [];
+                        this.currentQuestionIndex = 0;
+                        this.selectedOption = '';
+                        this.score = 0;
+                        this.isFinished = false;
+                    } catch (error) {
+                        console.error('获取数据失败:', error);
+                    }
+                }
+                else if(this.sendData == '6'){
+                    try {
+                        let result = await get('GET', 'getVue');
+                        this.questions = result || [];
+                        this.currentQuestionIndex = 0;
+                        this.selectedOption = '';
+                        this.score = 0;
+                        this.isFinished = false;
+                    } catch (error) {
+                        console.error('获取数据失败:', error);
+                    }
+                }
+            },
+
+            nextQuestion() {
+                this.checkAnswer();
+                if (this.currentQuestionIndex < this.questions.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.selectedOption = '';
+                }
+            },
+
+            previousQuestion() {
+                if (this.currentQuestionIndex > 0) {
+                    this.currentQuestionIndex--;
+                    this.selectedOption = '';
+                }
+            },
+
+            finishQuiz() {
+                this.checkAnswer();
+                this.isFinished = true;
+            },
+
+            checkAnswer() {
+                if (this.selectedOption === this.getCorrectOptionContent(this.currentQuestion.correct_option)) {
+                    this.score++;
+                }
+            },
+
+            getCorrectOptionContent(correctOption) {
+                switch (correctOption) {
+                    case 'A':
+                        return this.currentQuestion.optionA;
+                    case 'B':
+                        return this.currentQuestion.optionB;
+                    case 'C':
+                        return this.currentQuestion.optionC;
+                    case 'D':
+                        return this.currentQuestion.optionD;
+                    default:
+                        return '';
+                }
+            },
+
+            restartQuiz() {
+                this.fetchData();
+            }
+        },
+    }
 
     // 使用promise对ajax封装，减少代码量
     // get请求
@@ -228,7 +228,7 @@ export default {
         margin: 0;
         padding: 0;
     }
-    
+
     .floating-window-box {
         display: flex;
         position: fixed;

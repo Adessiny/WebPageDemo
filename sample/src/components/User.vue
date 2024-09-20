@@ -32,9 +32,13 @@
         props: ['sendData'],
         data() {
             return {
+                Assigned: 0, // 标记登录状态
+                User: [],
                 Account: '',
                 Password: '',
+                Course: 0,
                 errorMessage: '',
+                refresh: false,
                 isRegister: false // 默认登录模式
             };
         },
@@ -42,6 +46,7 @@
             setUserInvisable(bool) {
                 let data = { showUserOut: bool };
                 this.$emit('showUser', data);
+                if (this.refresh) { location.reload() }
             },
             toggleMode() {
                 this.isRegister = !this.isRegister; // 切换模式
@@ -49,7 +54,7 @@
                 this.Account = ''; // 清空输入框
                 this.Password = '';
             },
-            handleSubmit() {
+            async handleSubmit() {
                 this.errorMessage = '';
 
                 if (!this.Account || !this.Password) {
@@ -59,25 +64,79 @@
 
                 if (this.isRegister) {
                     // 注册逻辑
-                    this.register(this.Account, this.Password).then(response => {
-                        // 处理注册成功的逻辑
-                    }).catch(error => {
-                        this.errorMessage = '注册失败，请重试';
-                    });
+
                 } else {
                     // 登录逻辑
-                    this.login(this.Account, this.Password).then(response => {
-                        // 处理登录成功的逻辑
-                    }).catch(error => {
-                        this.errorMessage = '登录失败，请检查账户和密码';
-                    });
+                    try {
+                        let result = await get('Get', 'getUser');
+                        this.User = result || [];
+                        for (let i=0; i<this.User.length; i++) {
+                            if(this.Account == this.User[i].username && this.Password == this.User[i].password) { this.Assigned = 1; this.refresh = true; break }
+                        }
+                        if (this.Assigned == 1) { this.setUserInvisable(false) }
+                        console.log(this.User[0].id)
+                    } catch (error) {
+                        console.error('获取数据失败', error);
+                    }
                 }
             },
             close() {
                 this.setUserInvisable(false);
             }
         }
+        
     };
+    // 使用promise对ajax封装，减少代码量
+    // get请求
+    function get(method, path) { // method决定是GET还是POST还是UPDATE等等，path决定取哪个数据库的内容
+        return new Promise((resolve, reject) => {
+            let getContents = new XMLHttpRequest();
+            getContents.open(method, `http://127.0.0.1:8000/${path}`);// 本地服务器的地址+
+            getContents.send(); // 把请求发送到上述路径上，由server.js中相应的函数监听并处理
+            getContents.onreadystatechange = () => {
+                // 0请求未初始化，没有调用open()；1请求已建立但没有调用send()发送；2请求已发送，正在处理；3请求处理中，响应的部分数据可用，未全部完成；4响应已完成，可以获取并使用服务器的响应。
+                if (getContents.readyState === 4) {
+                    // status为200时代表HTTP请求响应成功
+                    if (getContents.status === 200) {
+                        resolve(JSON.parse(getContents.response)); // 解析响应并return
+                    } else {
+                        reject(new Error('请求失败'));
+                    }
+                }
+            };
+        });
+    }
+
+    // post请求
+    function post(method, path, data) { // method决定请求类型，path是请求的路径，data是要发送的数据
+        return new Promise((resolve, reject) => {
+            let postContents = new XMLHttpRequest();
+            postContents.open(method, `http://127.0.0.1:8000/${path}`);
+            postContents.setRequestHeader("Content-Type", "application/json"); // 设置请求头为JSON格式
+            postContents.send(JSON.stringify(data)); // 将数据转换为JSON字符串并发送
+
+            postContents.onreadystatechange = () => {
+                if (postContents.readyState === 4) {
+                    if (postContents.status === 200) {
+                        resolve(JSON.parse(postContents.response)); // 解析并返回响应
+                    } else {
+                        reject(new Error('请求失败'));
+                    }
+                }
+            };
+        });
+    }
+
+    //post用法：
+    // post('POST', 'updateUser', { id: 1, course: 1 })
+    // .then(response => {
+    //     console.log(response); // 处理成功的响应
+    // })
+    // .catch(error => {
+    //     console.error(error); // 处理错误
+    // });
+
+
 </script>
 
 <style lang="less">

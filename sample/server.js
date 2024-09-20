@@ -85,29 +85,29 @@ app.get('/getVue', (req, res) => {
     });
 });
 
-// app.post('/updateStatus', (req, res) => {
-//     const { id, status } = req.body;
-//     db.query('UPDATE Python SET status = ? WHERE id = ?', [status, id], (err, results) => {
-//         if (err) {
-//             return res.status(500).send({ error: "更新状态失败" });
-//         }
-//         res.send({ success: true });
-//     });
-// });
+app.post('/updateUser', (req, res) => {
+    const { id, course } = req.body;
+    db.query('UPDATE user SET course = ? WHERE id = ?', [course, id], (err, results) => {
+        if (err) {
+            return res.status(500).send({ error: "更新状态失败" });
+        }
+        res.send({ success: true });
+    });
+});
 
-// app.get('/getUsers', (req, res) => {
-//     db.query('SELECT * FROM users', (err, results) => {
-//         if (err) {
-//             results = {
-//                 warn: 'error',
-//                 message: "数据库获取失败"
-//             };
-//             res.send(JSON.stringify(results));
-//         } else {
-//             res.send(JSON.stringify(results));
-//         }
-//     });
-// });
+app.get('/getUser', (req, res) => {
+    db.query('SELECT * FROM user', (err, results) => {
+        if (err) {
+            results = {
+                warn: 'error',
+                message: "数据库获取失败"
+            };
+            res.send(JSON.stringify(results));
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    });
+});
 
 app.listen(8000, () => {
     console.log("服务器已启动");
