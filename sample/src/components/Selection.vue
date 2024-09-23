@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="floating-window-box" @click.self="close">
-            <div class="content-box">
+        <div class="sel-floating-window-box" @click.self="close">
+            <div class="sel-content-box">
                 <span @click="setSelectionInvisable('0')" class="close-button">X</span>
-                <div class="dropdown">
+                <div class="dropdownlist">
                     <span style="display: flex;align-items: center;justify-content: center;font-size: 18px;font-weight: 700;margin-top: 70px;margin-bottom: 5px;margin-left: 248px;">选择语言：</span>
                     <div class="dropdown-toggle" @click="toggleDropdown" style="margin-left: 237px;">{{ selectedOption }}
                         <i class="fas fa-chevron-down"></i>
@@ -11,7 +11,7 @@
                     <ul class="dropdown-menu" v-show="isOpen" style="margin-left: 250px;">
                         <li v-for="option in options" :key="option.value" @click="selectOption(option)">{{ option.label }}</li>
                     </ul>
-                    <button @click="chooseCourse()" v-if="selectedOption != ''" style="display: inline-block;margin-left: 247px;margin-top: 20px;width: 80px;height: 40px;border: 0;border-radius: 8px;cursor: pointer;">确定</button>
+                    <button @click="chooseCourse(); changeCourse()" v-if="selectedOption != ''" style="display: inline-block;margin-left: 247px;margin-top: 20px;width: 80px;height: 40px;border: 0;border-radius: 8px;cursor: pointer;">确定</button>
                 </div>
             </div>
         </div>
@@ -21,7 +21,12 @@
 <script>
     export default {
         name: 'Selection',
-        props: ['sendData'],
+        props: {
+            sendData: {
+                type: Object,
+                required: true
+            }
+        },
         data() {
             return {
                 isOpen: false,
@@ -33,9 +38,13 @@
                     { value: 4, label: 'Java'},
                     { value: 5, label: 'Vue'}
                 ],
+                userID: '0',
+                userCOURSE: 0,
             }
         },
+        mounted() { this.userID = this.sendData.id },
         methods:{
+            changeCourse() { this.$emit('changeCourse', { course: this.userCOURSE }) },
             setSelectionInvisable(int) {
                 let data = { showSelectionsOut:int };
                 this.$emit('showSelections', data)
@@ -45,6 +54,7 @@
             },
             selectOption(option){
                 this.selectedOption = option.label;
+                this.userCOURSE = option.value;
                 this.isOpen = false;
             },
             chooseCourse(){
@@ -67,9 +77,31 @@
                         break;
                 }
                 let data = { showSelectionsOut:a };
-                this.$emit('showSelections', data)
-            }
+                this.$emit('showSelections', data);
+                post('POST', 'updateUser', { id: this.userID, course: this.userCOURSE })
+                .then(response => { console.log("数据已发出", response) })
+                .catch(error => { console.log(error) }) // 根据用户 id 更改其目前课程
+            },
         },
+    }
+
+    // POST 封装
+    function post(method, path, data) { // method决定请求类型，path是请求的路径，data是要发送的数据
+        return new Promise((resolve, reject) => {
+            let postContents = new XMLHttpRequest();
+            postContents.open(method, `http://127.0.0.1:8000/${path}`);
+            postContents.setRequestHeader("Content-Type", "application/json"); // 设置请求头为JSON格式
+            postContents.send(JSON.stringify(data)); // 将数据转换为JSON字符串并发送
+            postContents.onreadystatechange = () => {
+                if (postContents.readyState === 4) {
+                    if (postContents.status === 200) {
+                        resolve(JSON.parse(postContents.response)); // 解析并返回响应
+                    } else {
+                        reject(new Error('请求失败'));
+                    }
+                }
+            };
+        });
     }
 </script>
 
@@ -78,7 +110,7 @@
         margin: 0;
         padding: 0;
     }
-    .floating-window-box {
+    .sel-floating-window-box {
         display: flex;
         position: fixed;
         top: 0;
@@ -91,7 +123,7 @@
         z-index: 10000;
         
     }
-    .content-box {
+    .sel-content-box {
         background: white;
         padding: 20px;
         border-radius: 5px;
@@ -111,7 +143,7 @@
         font-weight: 700;
         cursor: pointer;
     }
-    .dropdown {
+    .dropdownlist {
         position: relative;
         display: inline-block;
         align-items: center;

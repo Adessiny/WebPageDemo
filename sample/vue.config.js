@@ -10,3 +10,9 @@ module.exports = defineConfig({
     },
   },
 })
+
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+
+configureWebpack: {
+	plugins: [new NodePolyfillPlugin()]
+}

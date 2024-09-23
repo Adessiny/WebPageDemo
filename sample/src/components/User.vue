@@ -15,7 +15,7 @@
                             <input type="password" v-model="Password" placeholder="请输入密码" class="input-filed"/>
                         </div>
                         <button @click="handleSubmit" style="margin-top: 25px;margin-left: 90px;width: 85px;height: 35px;border: 0;border-radius: 8px;cursor: pointer;">{{ isRegister ? '注册' : '登录' }}</button>
-                        <div v-if="errorMessage" class="error-message" style="margin-left: 60px;margin-top: 15px;">{{ errorMessage }}</div>
+                        <div v-if="errorMessage" class="error-message" style="bottom: 0;right: 0;margin-bottom: 50px;margin-right: 20px;position: absolute;">{{ errorMessage }}</div>
                         <div class="toggle">
                             <span @click="toggleMode" style="bottom: 0;right: 0;margin-bottom: 15px;margin-right: 20px;position: absolute;">{{ isRegister ? '已有账户？点击登录' : '没有账户？点击注册' }}</span>
                         </div>
@@ -29,16 +29,21 @@
 <script>
     export default {
         name: 'User',
-        props: ['sendData'],
+        props: {
+            sendData: {
+                type: Object,
+                required: true
+            }
+        },
         data() {
             return {
                 Assigned: 0, // 标记登录状态
+                id: '0',
                 User: [],
                 Account: '',
                 Password: '',
                 Course: 0,
                 errorMessage: '',
-                refresh: false,
                 isRegister: false // 默认登录模式
             };
         },
@@ -46,8 +51,10 @@
             setUserInvisable(bool) {
                 let data = { showUserOut: bool };
                 this.$emit('showUser', data);
-                if (this.refresh) { location.reload() }
             },
+            whosLogged(data) { this.$emit('whosLogged', { id: data }) },
+            userCourse(data) { this.$emit('userCourse', { course: data }) },
+            userName(data) { this.$emit('userName', { name: data }) },
             toggleMode() {
                 this.isRegister = !this.isRegister; // 切换模式
                 this.errorMessage = ''; // 清除错误消息
@@ -71,10 +78,16 @@
                         let result = await get('Get', 'getUser');
                         this.User = result || [];
                         for (let i=0; i<this.User.length; i++) {
-                            if(this.Account == this.User[i].username && this.Password == this.User[i].password) { this.Assigned = 1; this.refresh = true; break }
+                            if(this.Account == String(this.User[i].username) && this.Password == String(this.User[i].password)) {
+                                this.whosLogged(this.User[i].id);
+                                this.userCourse(this.User[i].course);
+                                this.userName(this.User[i].username);
+                                this.Assigned = 1;
+                                this.setUserInvisable(false)
+                                return
+                            }
                         }
-                        if (this.Assigned == 1) { this.setUserInvisable(false) }
-                        console.log(this.User[0].id)
+                        this.errorMessage = '账号或密码错误'
                     } catch (error) {
                         console.error('获取数据失败', error);
                     }
@@ -84,7 +97,6 @@
                 this.setUserInvisable(false);
             }
         }
-        
     };
     // 使用promise对ajax封装，减少代码量
     // get请求
@@ -114,7 +126,6 @@
             postContents.open(method, `http://127.0.0.1:8000/${path}`);
             postContents.setRequestHeader("Content-Type", "application/json"); // 设置请求头为JSON格式
             postContents.send(JSON.stringify(data)); // 将数据转换为JSON字符串并发送
-
             postContents.onreadystatechange = () => {
                 if (postContents.readyState === 4) {
                     if (postContents.status === 200) {

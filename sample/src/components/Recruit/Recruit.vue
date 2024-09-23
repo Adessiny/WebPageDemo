@@ -7,11 +7,16 @@
 
                         </div>
                         <div class="left-content">
-                            <div class="user-name">Admin</div>
+                            <div class="user-name">{{ this.sendData.name }}</div>
                             <div class="sub-title">
                                 <div class="sub-title-text">
                                     <div class="tag-picture"></div>
-                                    <span class="ellipsis">Python基础语法-第一关(数据类型的转换)</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '0'">还未开始学习哦</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '1'">Python基础语法</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '2'">C语言基础语法</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '3'">C++面向对象的编程</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '4'">Java从基础设计到项目开发</span>
+                                    <span class="ellipsis" v-if="this.sendData.course === '5'">Vue从入门到精通</span>
                                 </div>
                             </div>
                         </div>
@@ -25,19 +30,70 @@
         </template>
 
         <script>
-
             export default{
                 //默认暴露 只能暴露一个
                 //多个组件时分别暴露去掉default
                 name: 'Recruit',
-                props: ['sendData'],
+                props: {
+                    sendData: {
+                        type: Object,
+                        required: true
+                    }
+                },
+
+                data() {
+                    return{
+                        userCourse: '0',
+                    };
+                },
+
+                mounted() {
+                    this.getCourse();
+                },
+
+                watch: {
+                    'sendData.id': function(newId, oldId) {
+                        this.getCourse();
+                    }
+                },
+
                 methods: {
                     setSelectionVisable(int){
                         let data = { showSelectionsOut:int };
                         this.$emit('showSelections', data)
-                        console.log("已调用",data)
+                    },
+
+                    async getCourse() {
+                        let result = await get('Get', 'getUser');
+                        this.User = result || [];
+                        for (let i = 0; i<this.User.length; i++) {
+                            if (this.sendData.id == this.User[i].id) {
+                                this.userCourse = this.User[i].course;
+                                return
+                            }
+                        }
                     }
                 }
+            }
+
+                // get请求
+            function get(method, path) { // method决定是GET还是POST还是UPDATE等等，path决定取哪个数据库的内容
+                return new Promise((resolve, reject) => {
+                    let getContents = new XMLHttpRequest();
+                    getContents.open(method, `http://127.0.0.1:8000/${path}`);// 本地服务器的地址+
+                    getContents.send(); // 把请求发送到上述路径上，由server.js中相应的函数监听并处理
+                    getContents.onreadystatechange = () => {
+                        // 0请求未初始化，没有调用open()；1请求已建立但没有调用send()发送；2请求已发送，正在处理；3请求处理中，响应的部分数据可用，未全部完成；4响应已完成，可以获取并使用服务器的响应。
+                        if (getContents.readyState === 4) {
+                            // status为200时代表HTTP请求响应成功
+                            if (getContents.status === 200) {
+                                resolve(JSON.parse(getContents.response)); // 解析响应并return
+                            } else {
+                                reject(new Error('请求失败'));
+                            }
+                        }
+                    };
+                });
             }
         </script>
 

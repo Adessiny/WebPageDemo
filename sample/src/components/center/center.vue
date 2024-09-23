@@ -15,8 +15,11 @@
                     </div>
                 </div>
                 <div class="func-wrapper">
-                    <div class="user-status" @click="showAuthModal">
-                        <img @click="showUserHere(true)" src="../center/images/doggy.jpg" class="avator">
+                    <div class="user-status" @click="toggleDropdown">
+                        <img @click="showUserHere(true)" :src="id === '0' ? require('../center/images/avatar.png') : require('../center/images/doggy.jpg')" class="avatar">
+                        <div v-if="dropdownVisible" class="dropdown">
+                            <div @click="logOut()" class="dropdown-item">退出登录</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -24,14 +27,14 @@
         <img src="../center/images/header.jpg" class="hd">
         <img src="../center/images/cover.png" class="bg-cover">
     
-        <Recruit @showSelections="showSelections" :sendData="isSelectionVisable" v-if="currentView === 'center'"/>
+        <Recruit @showSelections="showSelections" :sendData="{ isSelectionVisable, course, id, name }" v-if="currentView === 'center'"/>
         <Curriculum v-if="currentView === 'center'"/>
         <Grid v-if="currentView === 'center'"/>
         <Recommend @changeView="showComponent2" :sendData="currentView" v-if="currentView === 'center'"/>
         <Courses v-if="currentView === 'Courses'"/>
-        <User @showUser="showUser" :sendData="isUserVisable" v-if="isUserVisable"/>
+        <User @showUser="showUser" @whosLogged="whosLogged" @userCourse="userCourse" @userName="userName" :sendData="{ isUserVisable, id, course, name }" v-if="isUserVisable"/>
         <!-- 选择题库 -->
-        <Selection @showSelections="showSelections" :sendData="isSelectionVisable" v-if="isSelectionVisable === '1'"/>
+        <Selection @showSelections="showSelections" @changeCourse="changeCourse" :sendData="{ isSelectionVisable, id, course }" v-if="isSelectionVisable === '1'"/>
         <!-- 答题引入 -->
         <Exam @showSelections="showSelections" :sendData="isSelectionVisable" v-if="['2', '3', '4', '5', '6'].includes(isSelectionVisable)"/>
     </div>
@@ -64,17 +67,29 @@ export default {
             currentView: 'center',
             isUserVisable: false,
             isSelectionVisable: '0',
+            id: '0',
+            name: '未登录',
+            course: '0',
+            dropdownVisible: false,
         };
     },
 
     methods: {
+        toggleDropdown() {
+            if (this.id != '0') { this.dropdownVisible = !this.dropdownVisible; }
+        },
+        logOut() {
+            this.id = '0';
+            this.course = '0';
+            this.name = '未登录';
+            this.dropdownVisible = false
+        },
         showComponent1(view) {
             this.currentView = view;
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
-            console.log('页面值1:'+this.currentView);
         },
         showComponent2(data) {
             this.currentView = data.changingCurrentView;
@@ -82,20 +97,21 @@ export default {
                 top: 0,
                 behavior: 'smooth'
             });
-            console.log('页面值2:'+this.currentView);
         },
         showSelections(data) {
-            this.isSelectionVisable = String(data.showSelectionsOut);
-            console.log("这里也已运行",this.isSelectionVisable)
+            if (this.id !== '0') { this.isSelectionVisable = String(data.showSelectionsOut); }
+            else { this.showUserHere(true) }
         },
         showUserHere(bool) {
-            this.isUserVisable = bool;
-            console.log("center已调用User", this.isUserVisable)
+            if (this.id == '0') {
+                this.isUserVisable = bool;
+            }
         },
-        showUser(data) {
-            this.isUserVisable = data.showUserOut;
-            console.log("用户已回到center", this.isUserVisable)
-        }
+        showUser(data) { this.isUserVisable = data.showUserOut },
+        whosLogged(data) { this.id = String(data.id) },
+        userCourse(data) { this.course = String(data.course) },
+        userName(data) { this.name = String(data.name) },
+        changeCourse(data) { this.course = String(data.course) }
     }
 };
 </script>
@@ -192,7 +208,7 @@ export default {
                 display: flex;
                 align-items: center;
                 cursor: pointer;
-                img.avator{
+                img.avatar{
                     display: block;
                     width: 30px;
                     height: 30px;
@@ -207,5 +223,32 @@ export default {
                 }
             }
         }
+    }
+    .dropdown 
+    {
+        position: absolute;
+        top: 40px; // 调整气泡位置
+        right: -18px;
+        width: 85px;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000; // 确保在上层
+    }
+    .dropdown::after {
+        content: '';
+        position: absolute;
+        top: -20px; // 调整尖尖位置
+        right: 35px; // 尖尖的水平位置
+        border-width: 10px; // 尖尖大小
+        border-style: solid;
+        border-color: transparent transparent white transparent; // 尖尖颜色
+    }
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        cursor: pointer;
     }
 </style>

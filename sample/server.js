@@ -2,6 +2,7 @@
 const express = require('express'); // web 框架
 const cors = require('cors');
 const mysql = require('mysql');
+const { warn } = require('vue');
 
 const app = express();
 app.use(cors()); // 设置 cors 头
@@ -20,7 +21,7 @@ app.get('/getPython', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
         } else {
@@ -34,7 +35,7 @@ app.get('/getC', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
         } else {
@@ -48,7 +49,7 @@ app.get('/getCpp', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
         } else {
@@ -62,7 +63,7 @@ app.get('/getJava', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
         } else {
@@ -76,22 +77,22 @@ app.get('/getVue', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
-        } else {
-            res.send(JSON.stringify(results));
-        }
+        } else { res.send(JSON.stringify(results)); }
     });
 });
 
-app.post('/updateUser', (req, res) => {
-    const { id, course } = req.body;
+app.post('/updateUser', (req, res) => { const { id, course } = req.body;
     db.query('UPDATE user SET course = ? WHERE id = ?', [course, id], (err, results) => {
         if (err) {
-            return res.status(500).send({ error: "更新状态失败" });
-        }
-        res.send({ success: true });
+            results = {
+                warn: 'error',
+                message: "数据更新失败"
+            };
+            res.send(JSON.stringify(results));
+        } else { res.send(JSON.stringify(results)); }
     });
 });
 
@@ -100,7 +101,7 @@ app.get('/getUser', (req, res) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据库获取失败"
+                message: "数据获取失败"
             };
             res.send(JSON.stringify(results));
         } else {

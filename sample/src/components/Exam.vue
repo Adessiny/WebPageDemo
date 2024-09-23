@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div class="floating-window-box" @click.self="close">
-            <div class="content-box">
+        <div class="exam-floating-window-box" @click.self="close">
+            <div class="exam-content-box">
                 <span @click="setSelectionInvisable('0')" class="close-button">X</span>
                 
                 <div v-if="questions.length > 0"> <!-- 检查数据库表是否为空 -->
@@ -86,7 +86,6 @@
             setSelectionInvisable(int){
                 let data = { showSelectionsOut:int };
                 this.$emit('showSelections', data)
-                console.log("已调用",data)
             },
 
             async fetchData() {
@@ -219,8 +218,6 @@
             };
         });
     }
-
-
 </script>
 
 <style lang="less">
@@ -229,7 +226,7 @@
         padding: 0;
     }
 
-    .floating-window-box {
+    .exam-floating-window-box {
         display: flex;
         position: fixed;
         top: 0;
@@ -241,7 +238,7 @@
         align-items: center;
         z-index: 10000;
     }
-    .content-box {
+    .exam-content-box {
         background: white;
         padding: 20px;
         border-radius: 5px;
