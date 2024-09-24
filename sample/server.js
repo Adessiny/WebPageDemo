@@ -84,6 +84,20 @@ app.get('/getVue', (req, res) => {
     });
 });
 
+app.get('/getUser', (req, res) => {
+    db.query('SELECT * FROM user', (err, results) => {
+        if (err) {
+            results = {
+                warn: 'error',
+                message: "数据获取失败"
+            };
+            res.send(JSON.stringify(results));
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    });
+});
+
 app.post('/updateUser', (req, res) => { const { id, course } = req.body;
     db.query('UPDATE user SET course = ? WHERE id = ?', [course, id], (err, results) => {
         if (err) {
@@ -96,12 +110,12 @@ app.post('/updateUser', (req, res) => { const { id, course } = req.body;
     });
 });
 
-app.get('/getUser', (req, res) => {
-    db.query('SELECT * FROM user', (err, results) => {
+app.post('/insertUser', (req, res) => { const { id, username, password } = req.body;
+    db.query('INSERT INTO user (id, username, password) VALUES (?, ?, ?)', [id, username, password], (err, results) => {
         if (err) {
             results = {
                 warn: 'error',
-                message: "数据获取失败"
+                message: "数据插入失败"
             };
             res.send(JSON.stringify(results));
         } else {

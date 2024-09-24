@@ -43,6 +43,7 @@
                 Account: '',
                 Password: '',
                 Course: 0,
+                Length: 0,
                 errorMessage: '',
                 isRegister: false // 默认登录模式
             };
@@ -71,7 +72,24 @@
 
                 if (this.isRegister) {
                     // 注册逻辑
-
+                    try {
+                        let result1 = await get('Get', 'getUser');
+                        this.User = result1 || [];
+                        this.Length = this.User.length;
+                        for(let i = 0; i < this.Length; i++) {
+                            if(this.Account == String(this.User[i].username)) {
+                                this.errorMessage = '用户名已存在';
+                                return;
+                            }
+                        }
+                        post('Post', 'insertUser', { id: this.Length+1, username: this.Account, password: this.Password })
+                            .then(response => { console.log("数据已发出", response) })
+                                .catch(error => { console.log(error) })
+                        this.errorMessage = '注册成功！点击下方登录'
+                        return
+                    } catch (error) {
+                        console.error('数据发送失败', error);
+                    }
                 } else {
                     // 登录逻辑
                     try {

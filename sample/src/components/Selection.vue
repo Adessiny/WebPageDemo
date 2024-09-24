@@ -79,8 +79,8 @@
                 let data = { showSelectionsOut:a };
                 this.$emit('showSelections', data);
                 post('POST', 'updateUser', { id: this.userID, course: this.userCOURSE })
-                .then(response => { console.log("数据已发出", response) })
-                .catch(error => { console.log(error) }) // 根据用户 id 更改其目前课程
+                    .then(response => { console.log("数据已发出", response) })
+                        .catch(error => { console.log(error) }) // 根据用户 id 更改其目前课程
             },
         },
     }
