@@ -2,7 +2,7 @@
     <div>
         <div class="nav-wrap">
             <img src="../Curriculum/images/bookmark.svg" style="margin-left: 10px;">
-            <div style="margin-left: 10px;margin-right: 50px;z-index: 999;">我的课程</div>
+            <div style="margin-left: 10px;margin-right: 50px;z-index: 999;">基础课程</div>
             <div @click="scrollToCourse" style="color: blue;cursor: pointer;z-index: 999;">Python系列课程</div>
             <div style="margin-left: 10px;margin-right: 10px;">丨</div>
             <img src="../Curriculum/images/more-course.svg">
